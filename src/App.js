@@ -4,9 +4,19 @@ import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken }
 import { getFirestore, collection, addDoc, query, onSnapshot, serverTimestamp, doc, setDoc, getDoc } from 'firebase/firestore';
 import { HelpCircle, BookText, FileQuestion, Camera, Loader2, Send, BrainCircuit, History, User, GraduationCap, X } from 'lucide-react';
 
-// Firebase config - provided by the environment
-const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+// Firebase config - Read from environment variables (for Netlify) or global vars (for Canvas)
+const firebaseConfig = (typeof process !== 'undefined' && process.env.REACT_APP_FIREBASE_CONFIG)
+  ? JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG)
+  : (typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {});
+
+const appId = (typeof process !== 'undefined' && process.env.REACT_APP_ID)
+  ? process.env.REACT_APP_ID
+  : (typeof __app_id !== 'undefined' ? __app_id : 'default-app-id');
+
+const initialAuthToken = (typeof process !== 'undefined' && process.env.REACT_APP_INITIAL_AUTH_TOKEN)
+  ? process.env.REACT_APP_INITIAL_AUTH_TOKEN
+  : (typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null);
+
 
 // MBTI Types
 const mbtiTypes = [
@@ -43,6 +53,12 @@ export default function App() {
     // Initialize Firebase and Auth
     useEffect(() => {
         try {
+            // Check if firebase config is valid
+            if (!firebaseConfig.apiKey) {
+                console.error("Firebase configuration is missing or invalid.");
+                setError("Firebase 설정이 올바르지 않습니다. Netlify 환경 변수를 확인해주세요.");
+                return;
+            }
             const app = initializeApp(firebaseConfig);
             const authInstance = getAuth(app);
             const dbInstance = getFirestore(app);
@@ -62,9 +78,8 @@ export default function App() {
                     }
                 } else {
                     try {
-                        const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                        if (token) {
-                            await signInWithCustomToken(authInstance, token);
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(authInstance, initialAuthToken);
                         } else {
                             await signInAnonymously(authInstance);
                         }
