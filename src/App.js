@@ -4,7 +4,7 @@ import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken }
 import { getFirestore, collection, addDoc, query, onSnapshot, serverTimestamp, doc, setDoc, getDoc } from 'firebase/firestore';
 import { HelpCircle, BookText, FileQuestion, Camera, Loader2, Send, BrainCircuit, History, User, GraduationCap, X } from 'lucide-react';
 
-// Firebase config - Read from environment variables (for Netlify) or global vars (for Canvas)
+// Firebase config - Handles both Netlify (process.env) and Canvas preview (__vars)
 const firebaseConfig = (typeof process !== 'undefined' && process.env.REACT_APP_FIREBASE_CONFIG)
   ? JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG)
   : (typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {});
