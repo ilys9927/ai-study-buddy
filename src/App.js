@@ -55,7 +55,7 @@ export default function App() {
         try {
             // Check if firebase config is valid
             if (!firebaseConfig.apiKey) {
-                console.error("Firebase configuration is missing or invalid.");
+                console.error("Firebase configuration is missing or invalid. Check Netlify environment variables.");
                 setError("Firebase 설정이 올바르지 않습니다. Netlify 환경 변수를 확인해주세요.");
                 return;
             }
